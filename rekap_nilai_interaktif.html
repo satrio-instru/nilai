@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Nilai Interaktif - Kelas A & B</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #4facfe, transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .tables-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .table-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .table-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            padding: 30px;
+            background: white;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .chart-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .chart {
+            height: 300px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .bar {
+            background: linear-gradient(to top, #4facfe 0%, #00f2fe 100%);
+            border-radius: 5px 5px 0 0;
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .bar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .bar-label {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .grade-distribution {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .grade-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .grade-item h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .grade-item .count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        @media (max-width: 768px) {
+            .tables-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .search-highlight {
+            background-color: #ffeb3b !important;
+            color: #333 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Rekap Nilai Interaktif</h1>
+            <p>Kelas A & Kelas B - Analisis Pretest & Keaktifan</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <!-- Stats akan diisi oleh JavaScript -->
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="kelasFilter">Filter Kelas:</label>
+                <select id="kelasFilter">
+                    <option value="semua">Semua Kelas</option>
+                    <option value="A">Kelas A</option>
+                    <option value="B">Kelas B</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="searchInput">Cari Nama:</label>
+                <input type="text" id="searchInput" placeholder="Masukkan nama siswa...">
+            </div>
+            <div class="control-group">
+                <label for="sortBy">Urutkan:</label>
+                <select id="sortBy">
+                    <option value="nama">Nama</option>
+                    <option value="pretest">Pretest</option>
+                    <option value="keaktifan">Keaktifan</option>
+                    <option value="rata">Rata-rata</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tables-container" id="tablesContainer">
+            <!-- Tables akan diisi oleh JavaScript -->
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-section">
+                <h3>📈 Perbandingan Rata-rata Nilai</h3>
+                <div class="chart" id="averageChart"></div>
+            </div>
+
+            <div class="chart-section">
+                <h3>🎯 Distribusi Grade</h3>
+                <div class="grade-distribution" id="gradeDistribution"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Kelas A
+        const kelasA = [
+            {nama: "Andini firjinia", pretest: 85, keaktifan: 70},
+            {nama: "Hafsah Abu Hasan", pretest: 100, keaktifan: 65},
+            {nama: "Dwi Julia Rahmawati", pretest: 100, keaktifan: 70},
+            {nama: "Novi Widia Putri", pretest: 95, keaktifan: 85},
+            {nama: "Wulan Fadila", pretest: 90, keaktifan: 70},
+            {nama: "Laila Rahmasari", pretest: 90, keaktifan: 65},
+            {nama: "Irma Amalia", pretest: 90, keaktifan: 80},
+            {nama: "Fania Lutfi Dwi Astuti", pretest: 90, keaktifan: 65},
+            {nama: "Sinta Angraini", pretest: 90, keaktifan: 70},
+            {nama: "Salwa Dian Pratiwi", pretest: 100, keaktifan: 68},
+            {nama: "Anisa Asahra", pretest: 90, keaktifan: 70},
+            {nama: "Nur Intan Zahara", pretest: 90, keaktifan: 70},
+            {nama: "Dona Agnesia", pretest: 95, keaktifan: 70},
+            {nama: "Yemima Aulina Simamora", pretest: 100, keaktifan: 70},
+            {nama: "Syatrio Arwana", pretest: 95, keaktifan: 65},
+            {nama: "Nanda Alita", pretest: 85, keaktifan: 70},
+            {nama: "fani gulo", pretest: 85, keaktifan: 65},
+            {nama: "Ahmad khoiruddin", pretest: 95, keaktifan: 85},
+            {nama: "Putri Intan Maulina", pretest: 100, keaktifan: 70},
+            {nama: "Raihan Rafi", pretest: 85, keaktifan: 70},
+            {nama: "Bella Dinia Putri", pretest: 85, keaktifan: 70},
+            {nama: "Istna Fadila Al-Aziz", pretest: 85, keaktifan: 85},
+            {nama: "Anggi Claudia Bella", pretest: 90, keaktifan: 70},
+            {nama: "Mirza herlambang", pretest: 80, keaktifan: 70}
+        ];
+
+        // Data Kelas B
+        const kelasB = [
+            {nama: "Septiah Triwulandari", pretest: 100, keaktifan: 70},
+            {nama: "Rini Susanti", pretest: 100, keaktifan: 70},
+            {nama: "Cicilia Patricia Simamora", pretest: 100, keaktifan: 85},
+            {nama: "Oktaviana Ramadandi", pretest: 95, keaktifan: 70},
+            {nama: "Mei Dwi Tiana", pretest: 95, keaktifan: 85},
+            {nama: "Trilivi Nesta Boru Sembiring Maha", pretest: 100, keaktifan: 85},
+            {nama: "Letsa Andini", pretest: 100, keaktifan: 70},
+            {nama: "Cindy Afriliani", pretest: 100, keaktifan: 70},
+            {nama: "Aldryna Bunga Haryanto", pretest: 95, keaktifan: 70},
+            {nama: "Nayla Malika Azzahara", pretest: 100, keaktifan: 70},
+            {nama: "Nadesya Kaila Barmawi", pretest: 100, keaktifan: 85},
+            {nama: "Andini Gusmarinda", pretest: 100, keaktifan: 85},
+            {nama: "Widia Kurniasih", pretest: 100, keaktifan: 70},
+            {nama: "Ahmad Rizki Prihartanto", pretest: 95, keaktifan: 85},
+            {nama: "Dea Melani Saputri", pretest: 100, keaktifan: 70},
+            {nama: "Dafa Ariwinadi", pretest: 100, keaktifan: 85},
+            {nama: "Dila Azizah", pretest: 100, keaktifan: 85},
+            {nama: "Yulia Permatasari", pretest: 100, keaktifan: 70},
+            {nama: "Hotria Gre Gori", pretest: 100, keaktifan: 85},
+            {nama: "Suci Damayanti", pretest: 100, keaktifan: 70},
+            {nama: "Suci Ramdani", pretest: 95, keaktifan: 70}
+        ];
+
+        let filteredData = [...kelasA, ...kelasB];
+
+        function calculateStats() {
+            const allData = [...kelasA, ...kelasB];
+            
+            // Statistik Kelas A
+            const avgPretestA = kelasA.reduce((sum, s) => sum + s.pretest, 0) / kelasA.length;
+            const avgKeaktifanA = kelasA.reduce((sum, s) => sum + s.keaktifan, 0) / kelasA.length;
+            
+            // Statistik Kelas B
+            const avgPretestB = kelasB.reduce((sum, s) => sum + s.pretest, 0) / kelasB.length;
+            const avgKeaktifanB = kelasB.reduce((sum, s) => sum + s.keaktifan, 0) / kelasB.length;
+            
+            // Statistik Keseluruhan
+            const avgPretestAll = allData.reduce((sum, s) => sum + s.pretest, 0) / allData.length;
+            const avgKeaktifanAll = allData.reduce((sum, s) => sum + s.keaktifan, 0) / allData.length;
+            
+            // Nilai tertinggi dan terendah
+            const maxPretest = Math.max(...allData.map(s => s.pretest));
+            const minPretest = Math.min(...allData.map(s => s.pretest));
+            const maxKeaktifan = Math.max(...allData.map(s => s.keaktifan));
+            const minKeaktifan = Math.min(...allData.map(s => s.keaktifan));
+
+            return {
+                kelasA: { avgPretest: avgPretestA, avgKeaktifan: avgKeaktifanA, jumlah: kelasA.length },
+                kelasB: { avgPretest: avgPretestB, avgKeaktifan: avgKeaktifanB, jumlah: kelasB.length },
+                keseluruhan: { avgPretest: avgPretestAll, avgKeaktifan: avgKeaktifanAll, jumlah: allData.length },
+                ekstrem: { maxPretest, minPretest, maxKeaktifan, minKeaktifan }
+            };
+        }
+
+        function renderStats() {
+            const stats = calculateStats();
+            const statsGrid = document.getElementById('statsGrid');
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3>👥 Total Siswa</h3>
+                    <div class="value">${stats.keseluruhan.jumlah}</div>
+                    <div class="label">Kelas A: ${stats.kelasA.jumlah} | Kelas B: ${stats.kelasB.jumlah}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📝 Rata-rata Pretest</h3>
+                    <div class="value">${stats.keseluruhan.avgPretest.toFixed(1)}</div>
+                    <div class="label">A: ${stats.kelasA.avgPretest.toFixed(1)} | B: ${stats.kelasB.avgPretest.toFixed(1)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 Rata-rata Keaktifan</h3>
+                    <div class="value">${stats.keseluruhan.avgKeaktifan.toFixed(1)}</div>
+                    <div class="label">A: ${stats.kelasA.avgKeaktifan.toFixed(1)} | B: ${stats.kelasB.avgKeaktifan.toFixed(1)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⭐ Nilai Tertinggi</h3>
+                    <div class="value">${stats.ekstrem.maxPretest}</div>
+                    <div class="label">Pretest: ${stats.ekstrem.maxPretest} | Keaktifan: ${stats.ekstrem.maxKeaktifan}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Nilai Terendah</h3>
+                    <div class="value">${stats.ekstrem.minPretest}</div>
+                    <div class="label">Pretest: ${stats.ekstrem.minPretest} | Keaktifan: ${stats.ekstrem.minKeaktifan}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🏆 Kelas Terbaik</h3>
+                    <div class="value">${stats.kelasA.avgPretest > stats.kelasB.avgPretest ? 'A' : 'B'}</div>
+                    <div class="label">Berdasarkan rata-rata pretest</div>
+                </div>
+            `;
+        }
+
+        function renderTables() {
+            const container = document.getElementById('tablesContainer');
+            const kelasFilter = document.getElementById('kelasFilter').value;
+            
+            let dataA = kelasA;
+            let dataB = kelasB;
+            
+            if (kelasFilter === 'A') {
+                container.innerHTML = `
+                    <div class="table-section" style="grid-column: 1 / -1;">
+                        ${createTableHTML('Kelas A', dataA)}
+                    </div>
+                `;
+            } else if (kelasFilter === 'B') {
+                container.innerHTML = `
+                    <div class="table-section" style="grid-column: 1 / -1;">
+                        ${createTableHTML('Kelas B', dataB)}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="table-section">
+                        ${createTableHTML('Kelas A', dataA)}
+                    </div>
+                    <div class="table-section">
+                        ${createTableHTML('Kelas B', dataB)}
+                    </div>
+                `;
+            }
+        }
+
+        function createTableHTML(title, data) {
+            const sortBy = document.getElementById('sortBy').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Filter berdasarkan pencarian
+            let filteredData = data.filter(siswa => 
+                siswa.nama.toLowerCase().includes(searchTerm)
+            );
+            
+            // Sorting
+            filteredData.sort((a, b) => {
+                switch(sortBy) {
+                    case 'nama':
+                        return a.nama.localeCompare(b.nama);
+                    case 'pretest':
+                        return b.pretest - a.pretest;
+                    case 'keaktifan':
+                        return b.keaktifan - a.keaktifan;
+                    case 'rata':
+                        return ((b.pretest + b.keaktifan) / 2) - ((a.pretest + a.keaktifan) / 2);
+                    default:
+                        return 0;
+                }
+            });
+            
+            const rows = filteredData.map((siswa, index) => {
+                const rata = ((siswa.pretest + siswa.keaktifan) / 2).toFixed(1);
+                const namaHighlighted = searchTerm ? 
+                    siswa.nama.replace(new RegExp(searchTerm, 'gi'), match => `<span class="search-highlight">${match}</span>`) :
+                    siswa.nama;
+                
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${namaHighlighted}</td>
+                        <td>${siswa.pretest}</td>
+                        <td>${siswa.keaktifan}</td>
+                        <td><strong>${rata}</strong></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            return `
+                <div class="table-header">${title} (${filteredData.length} siswa)</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Pretest</th>
+                                <th>Keaktifan</th>
+                                <th>Rata-rata</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderCharts() {
+            const stats = calculateStats();
+            
+            // Chart rata-rata
+            const chartContainer = document.getElementById('averageChart');
+            const maxValue = Math.max(stats.kelasA.avgPretest, stats.kelasB.avgPretest, stats.kelasA.avgKeaktifan, stats.kelasB.avgKeaktifan);
+            
+            chartContainer.innerHTML = `
+                <div class="bar" style="height: ${(stats.kelasA.avgPretest / maxValue) * 200}px">
+                    <div class="bar-value">${stats.kelasA.avgPretest.toFixed(1)}</div>
+                    <div class="bar-label">Kelas A<br>Pretest</div>
+                </div>
+                <div class="bar" style="height: ${(stats.kelasA.avgKeaktifan / maxValue) * 200}px">
+                    <div class="bar-value">${stats.kelasA.avgKeaktifan.toFixed(1)}</div>
+                    <div class="bar-label">Kelas A<br>Keaktifan</div>
+                </div>
+                <div class="bar" style="height: ${(stats.kelasB.avgPretest / maxValue) * 200}px">
+                    <div class="bar-value">${stats.kelasB.avgPretest.toFixed(1)}</div>
+                    <div class="bar-label">Kelas B<br>Pretest</div>
+                </div>
+                <div class="bar" style="height: ${(stats.kelasB.avgKeaktifan / maxValue) * 200}px">
+                    <div class="bar-value">${stats.kelasB.avgKeaktifan.toFixed(1)}</div>
+                    <div class="bar-label">Kelas B<br>Keaktifan</div>
+                </div>
+            `;
+            
+            // Grade distribution
+            renderGradeDistribution();
+        }
+
+        function renderGradeDistribution() {
+            const allData = [...kelasA, ...kelasB];
+            const grades = {
+                'A (90-100)': 0,
+                'B (80-89)': 0,
+                'C (70-79)': 0,
+                'D (60-69)': 0,
+                'E (<60)': 0
+            };
+            
+            allData.forEach(siswa => {
+                const rata = (siswa.pretest + siswa.keaktifan) / 2;
+                if (rata >= 90) grades['A (90-100)']++;
+                else if (rata >= 80) grades['B (80-89)']++;
+                else if (rata >= 70) grades['C (70-79)']++;
+                else if (rata >= 60) grades['D (60-69)']++;
+                else grades['E (<60)']++;
+            });
+            
+            const container = document.getElementById('gradeDistribution');
+            container.innerHTML = Object.entries(grades).map(([grade, count]) => `
+                <div class="grade-item">
+                    <h4>${grade}</h4>
+                    <div class="count">${count} siswa</div>
+                </div>
+            `).join('');
+        }
+
+        function init() {
+            renderStats();
+            renderTables();
+            renderCharts();
+            
+            // Event listeners
+            document.getElementById('kelasFilter').addEventListener('change', () => {
+                renderTables();
+            });
+            
+            document.getElementById('searchInput').addEventListener('input', () => {
+                renderTables();
+            });
+            
+            document.getElementById('sortBy').addEventListener('change', () => {
+                renderTables();
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
